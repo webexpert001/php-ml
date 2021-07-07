@@ -76,13 +76,26 @@ class KNearestNeighbors implements Classifier
     public function predictWithProbability(array $sample, $limit = 5)
     {
         $distances = [];
+        $long = 1.0;
+        $near = 0.0;
 
         foreach ($this->samples as $index => $neighbor) {
-            $distances[$neighbor] = $this->distanceMetric->distance($sample, $neighbor);
+            $distance = $this->distanceMetric->distance($sample, $neighbor);
+            if ($distance > $long) $long = $distance;
+            if ($distance < $near) $near = $distance;
+
+            $distances[$neighbor] = $distance;
         }
 
         asort($distances);
 
-        return array_slice($distances, 0, $limit, true);
+        if (sizeof($distances) === 0) return [];
+
+        $results = [];
+        foreach ($distances as $key => $value) {
+            $results[$key] = intval((($long - $value) / $long) * 100);
+        }
+
+        return array_slice($results, 0, $limit, true);
     }
 }
