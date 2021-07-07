@@ -83,6 +83,6 @@ class KNearestNeighbors implements Classifier
 
         asort($distances);
 
-        return array_slice($distances, 0, $limit);
+        return array_slice($distances, 0, $limit, true);
     }
 }
